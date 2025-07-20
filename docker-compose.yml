@@ -1,0 +1,25 @@
+services:
+
+  pg:
+    image: postgres
+    environment:
+      POSTGRES_DB: app
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+    ports:
+      - "5432:5432"
+
+  webdb:
+    image: webdb/app
+    restart: always
+    extra_hosts:
+        - "host.docker.internal:host-gateway"
+    ports:
+        - "22071:22071"
+
+  app:
+    build: .
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
