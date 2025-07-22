@@ -1,36 +1,51 @@
-from io import BytesIO
-from typing import Any
+import os
+import tempfile
 
-from openpyxl import load_workbook
+# import pythoncom
+import win32com.client as win32
 
 
-def fill_cells(cells: dict[str, Any], file_content: bytes) -> bytes:
-    """
-    Заполняет ячейки Excel файла новыми значениями.
+def fill_cells(cells: dict[str, str | int | float], file_content: bytes) -> bytes:
+    # pythoncom.CoInitialize()
 
-    Args:
-        cells: Словарь {адрес_ячейки: значение} для обновления
-        file_content: Содержимое Excel файла в байтах
+    # Создаем временный файл для входного Excel
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx") as temp_input:
+        temp_input.write(file_content)
+        temp_input_path = temp_input.name
 
-    Returns:
-        bytes: Обновленное содержимое Excel файла
-    """
-    # Создаем BytesIO объект из байтов файла
-    file_stream = BytesIO(file_content)
-    workbook = load_workbook(file_stream)
-    sheet = workbook.active
+    # Создаем временный файл для выходного Excel
+    temp_output_path = tempfile.mktemp(suffix=".xlsx")
 
-    # Обновляем ячейки
-    for cell_address, value in cells.items():
-        # Конвертируем значение в строку если это число
-        if isinstance(value, (int, float)):
-            sheet[cell_address].value = value
-        else:
-            sheet[cell_address].value = str(value)
+    try:
+        xlApp = win32.Dispatch("Excel.Application")
+        xlApp.Visible = False
+        xlApp.DisplayAlerts = False  # Отключаем диалоги
 
-    # Сохраняем изменения в BytesIO
-    output_stream = BytesIO()
-    workbook.save(output_stream)
-    output_stream.seek(0)
+        # Открываем файл из временного пути
+        workbook = xlApp.Workbooks.Open(temp_input_path)
+        sheet = workbook.ActiveSheet
 
-    return output_stream.getvalue()
+        # Заполняем ячейки
+        for cell_address, value in cells.items():
+            if isinstance(value, (int, float)):
+                sheet.Range(cell_address).Value = value
+            else:
+                sheet.Range(cell_address).Value = str(value)
+
+        # Сохраняем в новый временный файл
+        workbook.SaveAs(temp_output_path)
+        workbook.Close()
+        xlApp.Quit()
+
+        # Читаем сохраненный файл в байты
+        with open(temp_output_path, "rb") as output_file:
+            result = output_file.read()
+
+        return result
+
+    finally:
+        # Очищаем временные файлы
+        if os.path.exists(temp_input_path):
+            os.unlink(temp_input_path)
+        if os.path.exists(temp_output_path):
+            os.unlink(temp_output_path)

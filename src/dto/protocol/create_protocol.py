@@ -23,3 +23,4 @@ class CreateProtocolInput(BaseModel):
 
 class CreateProtocolOutput(BaseModel):
     protocol_id: UUID4
+    file_content: bytes

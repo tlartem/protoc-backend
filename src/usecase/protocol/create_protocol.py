@@ -4,8 +4,7 @@ from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src import dto
-from src.adapter import postgres
-from src.adapter.excel import fill_cells
+from src.adapter import excel, postgres
 
 
 async def create_protocol(
@@ -17,8 +16,9 @@ async def create_protocol(
             status_code=status.HTTP_404_NOT_FOUND, detail="File not found"
         )
 
-    # Заполняем ячейки (это мок, результат не сохраняем)
-    fill_cells(input.cells_to_update, file.content)
-    print(input.cells_to_update)
+    # Заполняем ячейки и получаем модифицированный файл
+    modified_file_content = excel.fill_cells(input.cells_to_update, file.content)
 
-    return dto.CreateProtocolOutput(protocol_id=uuid.uuid4())
+    return dto.CreateProtocolOutput(
+        protocol_id=uuid.uuid4(), file_content=modified_file_content
+    )
