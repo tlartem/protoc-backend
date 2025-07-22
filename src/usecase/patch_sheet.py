@@ -9,6 +9,7 @@ from src.adapter import postgres
 async def patch_sheet(
     session: AsyncSession, sheet_id: uuid.UUID, _input: dto.PatchSheetInput
 ) -> dto.PatchSheetOutput | None:
+    print("patch_sheet", _input)
     update_data = {}
     if _input.name is not None:
         update_data["name"] = _input.name

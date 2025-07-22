@@ -8,17 +8,18 @@ from src import model
 if TYPE_CHECKING:
     from .file import File
     from .sheet import Sheet
+    from .template_attribute import TemplateAttribute
 
 
 class Template(model.Base):
     name: Mapped[str] = mapped_column()
-    description: Mapped[str | None] = mapped_column(nullable=True)
+    description: Mapped[str | None]
     elements: Mapped[dict[str, Any]] = mapped_column(JSON)
 
     file: Mapped["File | None"] = relationship(
         back_populates="template",
         uselist=False,
-        lazy="joined",
+        lazy="select",
         cascade="all, delete-orphan",
         single_parent=True,
     )
@@ -28,4 +29,8 @@ class Template(model.Base):
         uselist=True,
         lazy="select",
         cascade="all, delete-orphan",
+    )
+
+    template_attributes: Mapped[list["TemplateAttribute"]] = relationship(
+        cascade="all, delete-orphan"
     )

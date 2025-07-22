@@ -19,6 +19,11 @@ async def get_all(session: AsyncSession) -> list[File]:
     return list(files.scalars().all())
 
 
+async def get_by_template(session: AsyncSession, template_id: uuid.UUID) -> list[File]:
+    files = await session.execute(select(File).where(File.template_id == template_id))
+    return list(files.scalars().all())
+
+
 async def create(session: AsyncSession, file: File) -> File:
     session.add(file)
     await session.commit()

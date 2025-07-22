@@ -1,15 +1,13 @@
 from datetime import datetime
-from typing import Any
 from uuid import UUID
 
 from pydantic import BaseModel
 
 
-class Template(BaseModel):
+class Attribute(BaseModel):
     id: UUID
     name: str
-    description: str | None
-    elements: dict[str, Any]
+    is_required: bool
     created_at: datetime
     updated_at: datetime
     deleted_at: datetime | None
@@ -18,8 +16,8 @@ class Template(BaseModel):
         from_attributes = True
 
 
-class GetTemplatesOutput(BaseModel):
-    templates: list[Template]
+class GetAttributesOutput(BaseModel):
+    attributes: list[Attribute]
 
     class Config:
         from_attributes = True

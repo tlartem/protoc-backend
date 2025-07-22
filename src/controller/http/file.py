@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends
+from typing import Optional
+
+from fastapi import APIRouter, Depends, Query
 from pydantic import UUID4
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -18,6 +20,7 @@ async def get_file(
 
 @file_router.get("/")
 async def get_files(
+    template_id: Optional[UUID4] = Query(None, description="Фильтр по template_id"),
     session: AsyncSession = Depends(get_session),
 ) -> dto.GetFilesOutput:
-    return await usecase.get_files(session)
+    return await usecase.get_files(session, template_id)

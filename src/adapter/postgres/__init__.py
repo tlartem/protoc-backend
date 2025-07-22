@@ -1,9 +1,9 @@
-__all__ = ("template", "file", "sheet")
+__all__ = ("template", "file", "sheet", "attribute", "template_attribute")
 
 from shared.db_helper import DatabaseHelper
 from src.config import settings
 
-from . import file, sheet, template
+from . import attribute, file, sheet, template, template_attribute
 
 db_helper = DatabaseHelper(
     url=str(settings.db.url),

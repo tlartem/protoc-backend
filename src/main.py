@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from src.adapter.postgres import create_tables, db_dispose
-from src.controller.http import file, sheet, template, upload_file
+from src.controller.http import attribute, file, protocol, sheet, template, upload_file
 
 
 @asynccontextmanager
@@ -22,3 +22,5 @@ app.include_router(upload_file.upload_file_router)
 app.include_router(template.template_router)
 app.include_router(file.file_router)
 app.include_router(sheet.sheet_router)
+app.include_router(protocol.protocol_router)
+app.include_router(attribute.attribute_router)
