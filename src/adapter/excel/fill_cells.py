@@ -2,10 +2,11 @@ import os
 import tempfile
 
 # import pythoncom
-import win32com.client as win32
+# import win32com.client as win32
 
 
 def fill_cells(cells: dict[str, str | int | float], file_content: bytes) -> bytes:
+    ...
     # pythoncom.CoInitialize()
 
     # Создаем временный файл для входного Excel

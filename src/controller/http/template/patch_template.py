@@ -14,7 +14,10 @@ async def patch_template(
     input: dto.PatchTemplateInput,
     session: AsyncSession = Depends(get_session),
 ) -> dto.PatchTemplateOutput:
-    result = await usecase.patch_template(session, template_id, input)
-    if not result:
-        raise HTTPException(status_code=404, detail="Template not found")
-    return result
+    try:
+        result = await usecase.patch_template(session, template_id, input)
+        if not result:
+            raise HTTPException(status_code=404, detail="Template not found")
+        return result
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))

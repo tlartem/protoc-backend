@@ -4,14 +4,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src import dto, usecase
 from src.adapter.postgres import get_session
 
-from . import template_router
+from . import standard_router
 
 
-@template_router.post("/")
-async def create_template(
-    input: dto.CreateTemplateInput, session: AsyncSession = Depends(get_session)
-) -> dto.CreateTemplateOutput:
+@standard_router.post("/")
+async def create_standard(
+    input: dto.CreateStandardInput, session: AsyncSession = Depends(get_session)
+) -> dto.CreateStandardOutput:
     try:
-        return await usecase.create_template(session, input)
+        return await usecase.create_standard(session, input)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
