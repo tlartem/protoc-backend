@@ -22,5 +22,7 @@ class Settings(BaseSettings):
     # Database
     db: DatabaseConfig
 
+    test: bool = False
+
 
 settings = Settings()

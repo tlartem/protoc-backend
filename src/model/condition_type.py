@@ -5,7 +5,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src import model
 
 if TYPE_CHECKING:
-    from .laboratory import Laboratory, laboratory_condition_type
+    from .laboratory import Laboratory
 
 
 class ConditionType(model.Base):
