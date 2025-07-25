@@ -8,12 +8,25 @@ __all__ = [
     "attribute",
     "template_attribute",
     "standard",
+    "laboratory",
+    "condition_type",
+    "daily_condition",
 ]
 
 from shared.db_helper import DatabaseHelper
 from src.config import settings
 
-from . import attribute, file, sheet, standard, template, template_attribute
+from . import (
+    attribute,
+    condition_type,
+    daily_condition,
+    file,
+    laboratory,
+    sheet,
+    standard,
+    template,
+    template_attribute,
+)
 
 db_helper = DatabaseHelper(
     url=str(settings.db.url),

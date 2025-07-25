@@ -6,7 +6,9 @@ from fastapi import FastAPI
 from src.adapter.postgres import create_tables, db_dispose
 from src.controller.http import (
     attribute,
+    daily_condition,
     file,
+    laboratory,
     protocol,
     sheet,
     standard,
@@ -33,3 +35,5 @@ app.include_router(sheet.sheet_router)
 app.include_router(protocol.protocol_router)
 app.include_router(attribute.attribute_router)
 app.include_router(standard.standard_router)
+app.include_router(laboratory.laboratory_router)
+app.include_router(daily_condition.daily_condition_router)
