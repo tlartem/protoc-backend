@@ -4,6 +4,8 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
+from .get_template import TemplateWithAttributes
+
 
 class Template(BaseModel):
     id: UUID
@@ -19,7 +21,7 @@ class Template(BaseModel):
 
 
 class GetTemplatesOutput(BaseModel):
-    templates: list[Template]
+    templates: list[TemplateWithAttributes]
 
     class Config:
         from_attributes = True

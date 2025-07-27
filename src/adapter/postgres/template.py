@@ -53,3 +53,15 @@ async def update(
     await session.refresh(template)
 
     return template
+
+
+async def delete(session: AsyncSession, template_id: uuid.UUID) -> bool:
+    template = await session.get(Template, template_id)
+    if not template:
+        return False
+
+    await session.delete(template)
+    await session.commit()
+
+    logger.info(f"Deleted template with id: {template_id}")
+    return True

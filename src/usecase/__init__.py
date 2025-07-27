@@ -26,8 +26,11 @@ __all__ = (
     "get_daily_conditions",
     "update_daily_condition",
     "delete_daily_condition",
+    "copy_template",
+    "delete_template",
 )
 
+from .copy_template import copy_template
 from .create_attribute import create_attribute
 from .create_daily_condition import create_daily_condition
 from .create_sheet import create_sheet
@@ -35,6 +38,7 @@ from .create_standard import create_standard
 from .create_template import create_template
 from .delete_daily_condition import delete_daily_condition
 from .delete_standard import delete_standard
+from .delete_template import delete_template
 from .get_attribute_values import get_attribute_values
 from .get_attributes import get_attributes
 from .get_daily_condition import get_daily_condition

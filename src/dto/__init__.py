@@ -19,6 +19,7 @@ __all__ = (
     "CreateAttributeInput",
     "CreateAttributeOutput",
     "GetAttributesOutput",
+    "AttributeValue",
     "GetAttributeValuesOutput",
     "CreateStandardInput",
     "CreateStandardOutput",
@@ -36,8 +37,12 @@ __all__ = (
     "UpdateDailyConditionOutput",
     "TemplateWithAttributes",
     "TemplateAttributeDetail",
+    "CopyTemplateInput",
+    "CopyTemplateOutput",
+    "DeleteTemplateOutput",
 )
 
+from .copy_template import CopyTemplateInput, CopyTemplateOutput
 from .create_attribute import CreateAttributeInput, CreateAttributeOutput
 from .create_daily_condition import (
     CreateDailyConditionInput,
@@ -46,7 +51,8 @@ from .create_daily_condition import (
 from .create_sheet import CreateSheetInput, CreateSheetOutput
 from .create_standard import CreateStandardInput, CreateStandardOutput
 from .create_template import CreateTemplateInput, CreateTemplateOutput
-from .get_attribute_values import GetAttributeValuesOutput
+from .delete_template import DeleteTemplateOutput
+from .get_attribute_values import AttributeValue, GetAttributeValuesOutput
 from .get_attributes import GetAttributesOutput
 from .get_daily_condition import GetDailyConditionOutput
 from .get_daily_conditions import GetDailyConditionsOutput
