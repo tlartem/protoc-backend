@@ -23,7 +23,12 @@ def _kill_excel_processes():
             if proc.info["name"] and "excel" in proc.info["name"].lower():
                 try:
                     proc.kill()
-                except (psutil.NoSuchProcess, psutil.AccessDenied):
+                    proc.wait(timeout=2)  # Ждем завершения процесса
+                except (
+                    psutil.NoSuchProcess,
+                    psutil.AccessDenied,
+                    psutil.TimeoutExpired,
+                ):
                     pass
     except Exception:
         pass
@@ -41,17 +46,33 @@ def _ensure_com_initialized():
 def _cleanup_com():
     """Безопасная очистка COM"""
     try:
+        # Принудительная сборка мусора для освобождения COM объектов
+        gc.collect()
         pythoncom.CoUninitialize()
     except Exception:
         pass
+
+
+def _release_com_object(obj):
+    """Безопасное освобождение COM-объекта"""
+    if obj is not None:
+        try:
+            # Используем Marshal для правильного освобождения COM объекта
+            pythoncom._univgw.IUnknown_QueryInterface(obj, pythoncom.IID_IUnknown)
+            del obj
+        except Exception:
+            pass
 
 
 def fill_cells(cells: dict[str, str | int | float], file_content: bytes) -> bytes:
     if settings.test:
         return b""  # Возвращаем пустые байты вместо None
 
-    # Используем лок для предотвращения конфликтов между вызовами
-    with _excel_lock:
+    # Используем лок с timeout для предотвращения бесконечных блокировок
+    if not _excel_lock.acquire(timeout=30):  # Максимум 30 секунд ожидания
+        raise Exception("Не удалось получить доступ к Excel - возможно процесс завис")
+
+    try:
         # Инициализируем COM
         _ensure_com_initialized()
 
@@ -69,7 +90,7 @@ def fill_cells(cells: dict[str, str | int | float], file_content: bytes) -> byte
         try:
             # Очищаем зависшие процессы перед созданием нового
             _kill_excel_processes()
-            time.sleep(0.2)  # Даем время процессам завершиться
+            time.sleep(0.5)  # Увеличиваем время ожидания
 
             xlApp = win32.Dispatch("Excel.Application")
             xlApp.Visible = False
@@ -78,9 +99,12 @@ def fill_cells(cells: dict[str, str | int | float], file_content: bytes) -> byte
                 False  # Отключаем обновление экрана для производительности
             )
             xlApp.EnableEvents = False  # Отключаем события
+            xlApp.Interactive = False  # Отключаем пользовательский ввод
 
             # Открываем файл из временного пути
-            workbook = xlApp.Workbooks.Open(temp_input_path)
+            workbook = xlApp.Workbooks.Open(
+                temp_input_path, ReadOnly=False, UpdateLinks=False
+            )
             sheet = workbook.ActiveSheet
 
             # Заполняем ячейки
@@ -91,7 +115,7 @@ def fill_cells(cells: dict[str, str | int | float], file_content: bytes) -> byte
                     sheet.Range(cell_address).Value = str(value)
 
             # Сохраняем в новый временный файл
-            workbook.SaveAs(temp_output_path)
+            workbook.SaveAs(temp_output_path, FileFormat=51)  # 51 = xlsx format
 
             # Читаем сохраненный файл в байты ДО закрытия
             with open(temp_output_path, "rb") as output_file:
@@ -105,23 +129,35 @@ def fill_cells(cells: dict[str, str | int | float], file_content: bytes) -> byte
             raise e
 
         finally:
-            # Правильное закрытие COM объектов
+            # Правильное закрытие COM объектов в обратном порядке
             try:
                 if workbook is not None:
-                    workbook.Close(SaveChanges=False)
+                    try:
+                        workbook.Close(SaveChanges=False)
+                    except Exception:
+                        pass
+                    _release_com_object(workbook)
                     workbook = None
 
                 if xlApp is not None:
-                    xlApp.EnableEvents = True
-                    xlApp.ScreenUpdating = True
-                    xlApp.Quit()
+                    try:
+                        xlApp.EnableEvents = True
+                        xlApp.ScreenUpdating = True
+                        xlApp.Interactive = True
+                        xlApp.Quit()
+                    except Exception:
+                        pass
+                    _release_com_object(xlApp)
                     xlApp = None
 
-                # Принудительная сборка мусора для освобождения COM объектов
+                # Принудительная сборка мусора
                 gc.collect()
 
-                # Задержка для завершения процесса Excel
-                time.sleep(0.3)
+                # Увеличиваем задержку для завершения процесса Excel
+                time.sleep(1.0)
+
+                # Дополнительная проверка и очистка процессов
+                _kill_excel_processes()
 
             except Exception:
                 # Если обычное закрытие не сработало, принудительно убиваем процессы
@@ -129,7 +165,7 @@ def fill_cells(cells: dict[str, str | int | float], file_content: bytes) -> byte
 
             finally:
                 # Очищаем временные файлы с повторными попытками
-                max_attempts = 5
+                max_attempts = 10
                 for attempt in range(max_attempts):
                     try:
                         if os.path.exists(temp_input_path):
@@ -137,7 +173,7 @@ def fill_cells(cells: dict[str, str | int | float], file_content: bytes) -> byte
                         break
                     except (PermissionError, OSError):
                         if attempt < max_attempts - 1:
-                            time.sleep(0.2)
+                            time.sleep(0.5)
 
                 for attempt in range(max_attempts):
                     try:
@@ -146,4 +182,11 @@ def fill_cells(cells: dict[str, str | int | float], file_content: bytes) -> byte
                         break
                     except (PermissionError, OSError):
                         if attempt < max_attempts - 1:
-                            time.sleep(0.2)
+                            time.sleep(0.5)
+
+                # Очищаем COM после завершения всех операций
+                _cleanup_com()
+
+    finally:
+        # Обязательно освобождаем лок
+        _excel_lock.release()
