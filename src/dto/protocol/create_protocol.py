@@ -7,6 +7,7 @@ class CreateProtocolInput(BaseModel):
     template_id: UUID4
     file_id: UUID4
     cells_to_update: dict[str, Any]
+    print_area: str
 
     model_config = ConfigDict(
         json_schema_extra={
@@ -15,6 +16,7 @@ class CreateProtocolInput(BaseModel):
                     "template_id": "123e4567-e89b-12d3-a456-426614174000",
                     "file_id": "123e4567-e89b-12d3-a456-426614174111",
                     "cells_to_update": {"A2": "value1", "B2": "value2", "C2": 123},
+                    "print_area": "A1:C10",
                 }
             ]
         }

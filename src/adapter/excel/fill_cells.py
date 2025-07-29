@@ -8,7 +8,9 @@ if not settings.test:
     import win32com.client as win32
 
 
-def fill_cells(cells: dict[str, str | int | float], file_content: bytes) -> bytes:
+def fill_cells(
+    cells: dict[str, str | int | float], file_content: bytes, print_aria: str
+) -> bytes:
     if settings.test:
         return b""
 
@@ -37,6 +39,11 @@ def fill_cells(cells: dict[str, str | int | float], file_content: bytes) -> byte
                 sheet.Range(cell_address).Value = value
             else:
                 sheet.Range(cell_address).Value = str(value)
+
+        try:
+            sheet.PageSetup.PrintArea = print_aria
+        except Exception:
+            pass
 
         # Сохраняем в новый временный файл
         workbook.SaveAs(temp_output_path)
