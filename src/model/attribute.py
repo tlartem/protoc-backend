@@ -12,4 +12,6 @@ class Attribute(Base):
     name: Mapped[str] = mapped_column()
     is_required: Mapped[bool] = mapped_column()
 
-    template_attributes: Mapped[list["TemplateAttribute"]] = relationship()
+    template_attributes: Mapped[list["TemplateAttribute"]] = relationship(
+        back_populates="attribute"
+    )

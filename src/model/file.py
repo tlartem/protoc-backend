@@ -14,12 +14,12 @@ class File(model.Base):
     name: Mapped[str] = mapped_column()
     content: Mapped[bytes] = mapped_column(LargeBinary)
     cells: Mapped[dict[str, Any]] = mapped_column(JSON())
-    template_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("templates.id"), nullable=True)
+    template_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("templates.id"), nullable=True
+    )
 
     template: Mapped["Template"] = relationship(
-        back_populates="file",
+        back_populates="files",
         uselist=False,
         lazy="joined",
-        cascade="all, delete-orphan",
-        single_parent=True,
     )

@@ -16,12 +16,11 @@ class Template(model.Base):
     description: Mapped[str | None]
     elements: Mapped[dict[str, Any]] = mapped_column(JSON)
 
-    file: Mapped["File | None"] = relationship(
+    files: Mapped[list["File"]] = relationship(
         back_populates="template",
-        uselist=False,
+        uselist=True,
         lazy="select",
         cascade="all, delete-orphan",
-        single_parent=True,
     )
 
     sheets: Mapped[list["Sheet"]] = relationship(
