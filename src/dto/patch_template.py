@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Literal
 from uuid import UUID
 
 from pydantic import BaseModel
@@ -11,6 +11,8 @@ class PatchTemplateInput(BaseModel):
     description: str | None = None
     elements: dict[str, Any] | None = None
     attributes: list[SetTemplateAttributeInput] | None = None
+    group_id: UUID | Literal["ungroup"] | None = None
+    order: float | None = None
 
 
 class PatchTemplateOutput(BaseModel):

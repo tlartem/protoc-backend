@@ -9,6 +9,7 @@ __all__ = (
     "Laboratory",
     "ConditionType",
     "DailyCondition",
+    "Group",
 )
 
 from .attribute import Attribute
@@ -16,6 +17,7 @@ from .base import Base
 from .condition_type import ConditionType
 from .daily_condition import DailyCondition
 from .file import File
+from .group import Group
 from .laboratory import Laboratory
 from .sheet import Sheet
 from .standard import Standard

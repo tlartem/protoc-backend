@@ -12,6 +12,8 @@ class Template(BaseModel):
     name: str
     description: str | None
     elements: dict[str, Any]
+    order: float
+    group_id: UUID | None
     created_at: datetime
     updated_at: datetime
     deleted_at: datetime | None

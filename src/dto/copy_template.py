@@ -10,6 +10,8 @@ class CopyTemplateInput(BaseModel):
     new_name: str
     new_description: str | None = None
     new_attributes: list[SetTemplateAttributeInput] | None = None
+    group_id: uuid.UUID | None = None
+    copy_first_sheet_empty: bool = False
 
 
 class CopyTemplateOutput(BaseModel):

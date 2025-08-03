@@ -20,6 +20,8 @@ class Template(BaseModel):
     name: str
     description: str | None
     elements: dict[str, Any]
+    group_id: UUID | None
+    order: float
     created_at: datetime
     updated_at: datetime
     deleted_at: datetime | None
@@ -33,7 +35,9 @@ class TemplateWithAttributes(BaseModel):
     name: str
     description: str | None
     elements: dict[str, Any]
+    group_id: UUID | None
     attributes: list[TemplateAttributeDetail]
+    order: float
     created_at: datetime
     updated_at: datetime
     deleted_at: datetime | None

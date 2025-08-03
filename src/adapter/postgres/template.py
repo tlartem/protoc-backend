@@ -38,14 +38,16 @@ async def create(session: AsyncSession, template: Template) -> Template:
     return template
 
 
-async def update(
-    session: AsyncSession, template_id: uuid.UUID, **kwargs
-) -> Template | None:
+async def update(session: AsyncSession, template_id: uuid.UUID, **kwargs) -> Template | None:
     template = await session.get(Template, template_id)
     if not template:
         return None
 
     for key, value in kwargs.items():
+        if key == "group_id" and value == "ungroup":
+            value = None
+            setattr(template, key, value)
+            continue
         if value is not None:
             setattr(template, key, value)
 

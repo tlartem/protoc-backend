@@ -8,6 +8,7 @@ from src.controller.http import (
     attribute,
     daily_condition,
     file,
+    group,
     laboratory,
     protocol,
     sheet,
@@ -37,3 +38,4 @@ app.include_router(attribute.attribute_router)
 app.include_router(standard.standard_router)
 app.include_router(laboratory.laboratory_router)
 app.include_router(daily_condition.daily_condition_router)
+app.include_router(group.group_router)

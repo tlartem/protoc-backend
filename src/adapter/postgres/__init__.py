@@ -11,6 +11,7 @@ __all__ = [
     "laboratory",
     "condition_type",
     "daily_condition",
+    "group",
 ]
 
 from shared.db_helper import DatabaseHelper
@@ -21,6 +22,7 @@ from . import (
     condition_type,
     daily_condition,
     file,
+    group,
     laboratory,
     sheet,
     standard,

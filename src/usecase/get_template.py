@@ -6,9 +6,7 @@ from src import dto
 from src.adapter import postgres
 
 
-async def get_template(
-    session: AsyncSession, template_id: uuid.UUID
-) -> dto.GetTemplateOutput:
+async def get_template(session: AsyncSession, template_id: uuid.UUID) -> dto.GetTemplateOutput:
     # Получаем шаблон
     template = await postgres.template.get(session, template_id)
     if not template:
@@ -18,9 +16,7 @@ async def get_template(
     all_attributes = await postgres.attribute.get_all(session)
 
     # Получаем атрибуты шаблона (те, у которых есть значения)
-    template_attributes = await postgres.template_attribute.get_by_template_id(
-        session, template_id
-    )
+    template_attributes = await postgres.template_attribute.get_by_template_id(session, template_id)
 
     # Создаем словарь для быстрого поиска значений атрибутов
     template_attr_values = {ta.attribute_id: ta for ta in template_attributes}
@@ -44,7 +40,9 @@ async def get_template(
         name=template.name,
         description=template.description,
         elements=template.elements,
+        group_id=template.group_id,
         attributes=attributes_details,
+        order=template.order,
         created_at=template.created_at,
         updated_at=template.updated_at,
         deleted_at=template.deleted_at,

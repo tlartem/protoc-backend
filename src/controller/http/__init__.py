@@ -2,6 +2,7 @@ from . import (
     attribute,
     daily_condition,
     file,
+    group,
     laboratory,
     protocol,
     sheet,
@@ -20,4 +21,5 @@ __all__ = [
     "standard",
     "laboratory",
     "daily_condition",
+    "group",
 ]

@@ -17,6 +17,10 @@ async def patch_template(
         update_data["description"] = _input.description
     if _input.elements is not None:
         update_data["elements"] = _input.elements
+    if _input.group_id is not None:
+        update_data["group_id"] = _input.group_id
+    if _input.order is not None:
+        update_data["order"] = _input.order
 
     template = await postgres.template.update(session, template_id, **update_data)
     if not template:
@@ -26,9 +30,7 @@ async def patch_template(
     if _input.attributes is not None:
         for attr_input in _input.attributes:
             # Проверяем, что атрибут существует
-            attribute = await postgres.attribute.get_by_id(
-                session, attr_input.attribute_id
-            )
+            attribute = await postgres.attribute.get_by_id(session, attr_input.attribute_id)
             if not attribute:
                 raise ValueError(f"Атрибут с ID {attr_input.attribute_id} не найден")
 
@@ -44,8 +46,6 @@ async def patch_template(
                     attribute_id=attr_input.attribute_id,
                     value=attr_input.value,
                 )
-                await postgres.template_attribute.create(
-                    session, new_template_attribute
-                )
+                await postgres.template_attribute.create(session, new_template_attribute)
 
     return dto.PatchTemplateOutput(id=template.id)

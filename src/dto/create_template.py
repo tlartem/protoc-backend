@@ -11,6 +11,7 @@ class CreateTemplateInput(BaseModel):
     description: str
     elements: dict[str, Any]
     attributes: list[SetTemplateAttributeInput] | None = None
+    group_id: uuid.UUID | None = None
 
 
 class CreateTemplateOutput(BaseModel):
