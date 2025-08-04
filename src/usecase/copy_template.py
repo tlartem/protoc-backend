@@ -6,7 +6,9 @@ from src import dto, model
 from src.adapter import postgres
 
 
-async def copy_template(_input: dto.CopyTemplateInput, session: AsyncSession) -> dto.CopyTemplateOutput:
+async def copy_template(
+    _input: dto.CopyTemplateInput, session: AsyncSession
+) -> dto.CopyTemplateOutput:
     original_template = await postgres.template.get(session, _input.template_id)
     if not original_template:
         raise ValueError(f"Template {_input.template_id} not found")
@@ -31,9 +33,12 @@ async def copy_template(_input: dto.CopyTemplateInput, session: AsyncSession) ->
         await postgres.file.create(session, new_file)
 
     original_sheets = await postgres.sheet.get_by_template(session, _input.template_id)
-    for i, original_sheet in enumerate(original_sheets):
-        # Если это первый лист и установлен флаг copy_first_sheet_empty, копируем его пустым
-        cells = {} if i == 0 and _input.copy_first_sheet_empty else original_sheet.cells
+    for original_sheet in original_sheets:
+        cells = (
+            {}
+            if original_sheet.name == "L" and _input.copy_first_sheet_empty
+            else original_sheet.cells
+        )
 
         new_sheet = model.Sheet(
             name=original_sheet.name,
@@ -51,7 +56,9 @@ async def copy_template(_input: dto.CopyTemplateInput, session: AsyncSession) ->
             )
             await postgres.template_attribute.create(session, template_attribute)
     else:
-        original_attributes = await postgres.template_attribute.get_by_template_id(session, _input.template_id)
+        original_attributes = await postgres.template_attribute.get_by_template_id(
+            session, _input.template_id
+        )
         for original_attr in original_attributes:
             template_attribute = model.TemplateAttribute(
                 template_id=new_template.id,
@@ -73,7 +80,9 @@ def _update_element_ids(elements: dict) -> dict:
     for _, element_data in elements.items():
         new_id = str(uuid.uuid4())
 
-        new_element_data = element_data.copy() if isinstance(element_data, dict) else element_data
+        new_element_data = (
+            element_data.copy() if isinstance(element_data, dict) else element_data
+        )
         if isinstance(new_element_data, dict) and "id" in new_element_data:
             new_element_data["id"] = new_id
 
